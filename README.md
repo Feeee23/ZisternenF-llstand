@@ -28,11 +28,11 @@ Versionshistorie
  *D7    D11-> Display D6 (13v.l.)
  *D8    D12-> Display D7 (14v.l.)
  *D9    D13-> Display A (15v.l.)
- *          Display K (16v.l.)->GND
- *          Display VSS (1v.l.)->GND
- *          Dispaly VDD (2v.l.)->5V
- *          Dispaly V0 (3v.l.)->Poti->rest plus minus
- *          Display RW (5v.l.)->GND
+ *.         Display K (16v.l.)->GND
+ *.         Display VSS (1v.l.)->GND
+ *.         Dispaly VDD (2v.l.)->5V
+ *.         Dispaly V0 (3v.l.)->Poti->rest plus minus
+ *.         Display RW (5v.l.)->GND
  *D12    D50-> SD-Karte MISO 
  *D11    D51-> SD-Karte MOSI
  *D13    D52-> SD-Karte SCK

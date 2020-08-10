@@ -9,7 +9,9 @@ der Stumpe Kegal r_1=10dm, r_2=3dm, h=6dm, der Überlauf kommt nach 2,5dm (16,5d
 Der Sensor wird in einem Rohr d__ auf der Höhe 1,90m angebracht werden
 
 Versionshistorie
-1. Master
-2. TimeasString
-3. SD-Card
+1. Master (Arduino)
+2. TimeasString (Arduino)
+3. SD-Card (Arduino)
+4. Arduino_finish (Arduino)
+5. ATMega_1 (ATMega)
 ...

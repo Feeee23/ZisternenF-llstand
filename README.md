@@ -6,7 +6,10 @@ Die Zisterne hat die Form eines Zylinders mit darauf sitzendem Stumpen Kegel
 Der Zylinder hat die Maße r=10dm h=20dm
 der Stumpe Kegal r_1=10dm, r_2=3dm, h=6dm, der Überlauf kommt nach 2,5dm (16,5dm vom Boden)
 
-Der Sensor wird in einem Rohr d__ auf der Höhe __ angebracht werden
+Der Sensor wird in einem Rohr d__ auf der Höhe 1,90m angebracht werden
 
 Versionshistorie
-1.
+1. Master
+2. TimeasString
+3. SD-Card
+...

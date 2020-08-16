@@ -45,8 +45,9 @@ Verbindungen
  .          RTC SQW->nix
  
 
+
+
 ToDO
-Neue RTC einbinden
 evtl. Datum von DS-Card holen
-Stromversorgung
+
 

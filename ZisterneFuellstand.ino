@@ -1,3 +1,4 @@
+//https://github.com/Feeee23/ZisternenF-llstand/blob/master/README.md
 #include <LiquidCrystal.h>
 #include<SR04.h>
 #include<Wire.h>
@@ -12,8 +13,8 @@ const int CS=10;
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(3, 4, 5, 6, 7, 8);
 //define Pins for UltrasonicSensor
-int Trig=1;
-int Echo=2;
+int Trig=2;
+int Echo=1;
 SR04 sr04= SR04(Echo, Trig);
 //Initaliz the clock
 DS3231 clock;
@@ -23,11 +24,11 @@ int Schalter=0; //Pin für Schalter  Def
 int FStand=0;
 int L=0;
 int k=0;
+int m=0;
 int Backlight=9; //HIntergundlicht über Pin 13 Steuern
 
 //*****************************************Setup
 void setup() {
-  Serial.begin(9600);
   lcd.begin(16, 2);
   pinMode(Backlight, OUTPUT);
   pinMode(Schalter, INPUT);
@@ -43,6 +44,12 @@ void setup() {
  }
 //**********************************************Ausgabe
 void Ausgabe(int hoehe, int liter){
+    if(!SD.begin()){
+    digitalWrite(Backlight, HIGH);
+    lcd.print("initalization failed");
+    delay(1000);
+    digitalWrite(Backlight, LOW);
+   }  
    myFile=SD.open("Daten.txt", FILE_WRITE);
    if(!myFile){
     digitalWrite(Backlight, HIGH);
@@ -122,6 +129,10 @@ void Ausgabe(int hoehe, int liter){
 }
 //**********************************************Ausgabe2 ohne Display
 void Ausgabe2(int hoehe, int liter){
+     
+   if(!SD.begin()){
+    lcd.print("initalization failed");
+   }  
    myFile=SD.open("Daten.txt", FILE_WRITE);
 
    dt=clock.getDateTime();
@@ -163,6 +174,19 @@ int Sensor(){
   int C=sr04.Distance();
   int D=(A+B+C)/3;
   int F=190-D; //Die Höhe des Sensors minus den Messwert ergibt den Füllstand
+  myFile.close(); //*
+    if(A>195||B>195||C>195){
+    m++;
+    if(m>5){
+      digitalWrite(Backlight, HIGH);
+      lcd.print("Fehler Sensor");
+      delay(500);
+      lcd.clear();
+      digitalWrite(Backlight, LOW);
+      return;
+    }
+    return Sensor();
+  }
   return F;
  }
  //*****************************************Rechner
@@ -194,12 +218,13 @@ void loop() {
   if(dt.hour==12 & dt.minute==0){
     FStand=Sensor();
   }
+  m=0;
   }
 /*Verbindungen
  *AT    Arduino -> Physical
  *D0    D4->  Taster zum Einschalten weiter auf GND
- *D1    D5->  Ultraschall TRIG
- *D2    D6->  Ultraschall ECHO
+ *D2    D5->  Ultraschall TRIG
+ *D3    D6->  Ultraschall ECHO
  *D3    D7->  Display RS (4v.l.)
  *D4    D8->  Dispaly E (6v.l.)
  *D5    D9->  Display D4 (11v.l.)

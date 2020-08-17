@@ -1,15 +1,13 @@
 //https://github.com/Feeee23/ZisternenF-llstand/blob/master/README.md
 #include <LiquidCrystal.h>
-#include<SR04.h>
-#include<Wire.h>
-#include<DS3231.h>
+#include<SR04.h> //Ultarschallsensor
+//#include<Wire.h>
+#include<DS3231.h> //RTC
 #include<SPI.h>
-#include<SD.h>
-#include<String.h>
+#include<SD.h>  //SD-Karte
 //*********************************************************allg Declaration
 File myFile;
-const int CS=10;
-
+const int CS=10; //CardSelect auf Pin 10
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(3, 4, 5, 6, 7, 8);
 //define Pins for UltrasonicSensor
@@ -21,55 +19,54 @@ DS3231 clock;
 RTCDateTime dt;
 
 int Schalter=0; //Pin für Schalter  Def
-int FStand=0;
-int L=0;
-int k=0;
-int m=0;
+int FStand=0; //Fuellstand cm
+int L=0; //Liter
+int m=0; // Zaehler für falsche Messwerte umm endlossschleife zu verhindern
 int Backlight=9; //HIntergundlicht über Pin 13 Steuern
 
 //*****************************************Setup
 void setup() {
-  lcd.begin(16, 2);
-  pinMode(Backlight, OUTPUT);
-  pinMode(Schalter, INPUT);
+  lcd.begin(16, 2); //LCD Bildschirm Starten
+  pinMode(Backlight, OUTPUT); //Licht von LCD
+  pinMode(Schalter, INPUT); //Taster auf GND
   digitalWrite(Schalter, HIGH);
-  if(!SD.begin()){
+  if(!SD.begin()){ //SD-Karte Inizalisieren und Starten
     digitalWrite(Backlight, HIGH);
     lcd.print("initalization failed");
     delay(1000);
     digitalWrite(Backlight, LOW);
    }
-  clock.begin();
-  clock.setDateTime(__DATE__, __TIME__);
+  clock.begin(); //Uhr Starten
+  clock.setDateTime(__DATE__, __TIME__); //evtl. ändern, holebn von SD-Karte? welches Format
  }
 //**********************************************Ausgabe
 void Ausgabe(int hoehe, int liter){
-    if(!SD.begin()){
+    if(!SD.begin()){ //SD-Karte starten und initalisieren
     digitalWrite(Backlight, HIGH);
     lcd.print("initalization failed");
     delay(1000);
     digitalWrite(Backlight, LOW);
    }  
-   myFile=SD.open("Daten.txt", FILE_WRITE);
+   myFile=SD.open("Daten.txt", FILE_WRITE); //Daten Datei öffen zum schreiben, dadurch kann SD-Karte jederzeit im Betrieb rein und raus genommen werden
    if(!myFile){
     digitalWrite(Backlight, HIGH);
     lcd.print("Error open File");
     delay(1000);
+    lcd.clear();
     digitalWrite(Backlight, LOW);
    }
    digitalWrite(Backlight, HIGH);
    
-   lcd.clear();
+   lcd.clear(); //Beginn der Ausgabe 
+    dt=clock.getDateTime(); //Uhrzeit holen
    lcd.setCursor(0, 0);
-   dt=clock.getDateTime();
-   lcd.setCursor(0, 0);
-   if(dt.day<10){
+   if(dt.day<10){ //Einheitliches Format immer DD.MM.YYYY
     lcd.print("0");
     myFile.print("0");
    }
-   lcd.print(dt.day); lcd.print(".");
-   myFile.print(dt.day); myFile.print(".");
-    if(dt.month<10){
+   lcd.print(dt.day); lcd.print("."); //Tag auf lcd auusgeben
+   myFile.print(dt.day); myFile.print("."); //Tag auf SD-Karte schreiben
+    if(dt.month<10){ //Einheitliches Format immer DD.MM.YYYY
     lcd.print("0");
     myFile.print("0");
    }
@@ -77,13 +74,13 @@ void Ausgabe(int hoehe, int liter){
    myFile.print(dt.month); myFile.print(".");
    lcd.print(dt.year); lcd.setCursor(0, 1);
    myFile.print(dt.year); myFile.print("  ");
-    if(dt.hour<10){
+    if(dt.hour<10){ //Einheitliches Format immer hh:mm
     lcd.print("0");
     myFile.print("0");
    }
    lcd.print(dt.hour); lcd.print(":");
    myFile.print(dt.hour);myFile.print(":");
-   if(dt.minute<10){
+   if(dt.minute<10){ //Einheitliches Format immer hh:mm
     lcd.print("0");
     myFile.print("0");
    }
@@ -91,9 +88,9 @@ void Ausgabe(int hoehe, int liter){
    myFile.print(dt.minute); myFile.print("  ");
    delay(3000);
   
-  lcd.clear();
+  lcd.clear();//Fueüllstand in cm ausgeben
   lcd.setCursor(0, 0);
-  lcd.print("Fuellstand:");
+  lcd.print("Fuellstand:"); 
   myFile.print("Fuellstand: ");
   lcd.setCursor(0, 1);
   lcd.print(hoehe);
@@ -103,7 +100,7 @@ void Ausgabe(int hoehe, int liter){
   myFile.print(" cm, ");
   delay(3000);
   
-  if(hoehe>155){
+  if(hoehe>155){ //Warung wenn Fuellstand zu hoch
     lcd.setCursor(0,0);
     lcd.print("Wasser laeuft ab");
     lcd.setCursor(0, 1);
@@ -111,7 +108,7 @@ void Ausgabe(int hoehe, int liter){
     delay(3000);
   }
    
-   lcd.clear();
+   lcd.clear(); //Ausgabe Liter Anzahl
    lcd.setCursor(0, 0);
    lcd.print("entspricht ca.:");
    myFile.print("entspricht ca.: ");
@@ -123,11 +120,11 @@ void Ausgabe(int hoehe, int liter){
    myFile.println(" l");
   delay(3000);
 
-  myFile.close();
+  myFile.close(); //Datei schließen um jederzeit entnehemn zu können
  lcd.clear();
  digitalWrite(Backlight, LOW);
 }
-//**********************************************Ausgabe2 ohne Display
+//**********************************************Ausgabe2 ohne Display alles gleich Ausgabe aber ohne Lcd und ohne delays
 void Ausgabe2(int hoehe, int liter){
      
    if(!SD.begin()){
@@ -153,31 +150,28 @@ void Ausgabe2(int hoehe, int liter){
     myFile.print("0");
    }
    myFile.print(dt.minute); myFile.print("  ");
-   delay(3000);
   
   myFile.print("Fuellstand: ");
   myFile.print(hoehe);
   myFile.print(" cm, ");
-  delay(3000);
     
    myFile.print("entspricht ca.: ");
    myFile.print(liter);
    myFile.println(" l");
-  delay(3000);
 
   myFile.close();
 }
-//**************************************Sensor
+//**************************************Sensor 
 int Sensor(){
-  int A=sr04.Distance();
+  int A=sr04.Distance(); //Messe dreimal hintereinander um Feler zu minimiern
   int B=sr04.Distance();
   int C=sr04.Distance();
-  int D=(A+B+C)/3;
-  int F=190-D; //Die Höhe des Sensors minus den Messwert ergibt den Füllstand
-  myFile.close(); //*
-    if(A>195||B>195||C>195){
+  int D=(A+B+C)/3; //Durchschnitt der 3 Werte ermitteln
+  int F=190-D; //Die Höhe des Sensors (190cm) minus den Messwert ergibt den Füllstand
+
+    if(A>195||B>195||C>195){ //Fehler minimierung wenn ein Messwert zu groß mach es nochmal (5cm Toleranz)
     m++;
-    if(m>5){
+    if(m>5){ //Nach 5mal Falsch mach einfach weiter (Endlosschleife verhindern)
       digitalWrite(Backlight, HIGH);
       lcd.print("Fehler Sensor");
       delay(500);
@@ -187,44 +181,41 @@ int Sensor(){
     }
     return Sensor();
   }
-  return F;
+  return F; //Fuellstand zurückgeben
  }
  //*****************************************Rechner
-int Rechner(int FS){
+int Rechner(int FS){ //Berechnet aus dem Fuellstand die Literanzahl
   float l=0;
-  if (FS<140){
+  if (FS<140){ //under 1,4m ist die Zisterne Zylindrisch
     l=100*3.1415*FS/10;
-   }else{
-  l=4400+(FS/10-14)*314.15-36.65*(FS/10-14)*(FS/10-14)+1.43*(FS/10-14)*(FS/10-14)*(FS/10-14);
+   }else{ //Darueber Kegelstumpf
+  l=4400+(FS/10-14)*314.15-36.65*(FS/10-14)*(FS/10-14)+1.43*(FS/10-14)*(FS/10-14)*(FS/10-14); //max wert Zylindrsich plus Zylinderstumpf formel (r2 durch h ausgedrueckt)
  }
- int k=l;
-  return k;
+ int k=l; //von float auf int runden
+  return k; //Literanzahl zurueckgeben
 }
 //***********************************loop
 void loop() {
-  dt=clock.getDateTime();
-    if(dt.hour==12 & dt.minute==12 & dt.second==12){ //einmaltägliche abfrage um 12:12:12 uhr
-      FStand=Sensor();
-      L=Rechner(FStand);
-      Ausgabe2(FStand, L);
-      k++;
+  dt=clock.getDateTime(); //aktuelle Uhrzeit holen
+    if(dt.hour==12 & dt.minute==12 & dt.second==12){ //einmaltägliche abfrage um 12:12:12 uhr Fuellstand abfragen
+      FStand=Sensor(); //Sensor anfragen
+      L=Rechner(FStand); //in liter umrechen
+      Ausgabe2(FStand, L); //Auf SD-Karte Schreiben 
+      delay(1000); //damit die Abrage nur einemal Passiert warten eine secunde
   }
 
-  if (digitalRead(Schalter)==LOW){
-    FStand=Sensor();
-    L=Rechner(FStand);
-    Ausgabe(FStand, L);  
+  if (digitalRead(Schalter)==LOW){ //Wenn Taster gedrueckt
+    FStand=Sensor(); //Sensor Anfragen
+    L=Rechner(FStand); //in Liter umrechen
+    Ausgabe(FStand, L);//Ausgabe auf lcd und speichern auf SD-Karte
     }
-  if(dt.hour==12 & dt.minute==0){
-    FStand=Sensor();
-  }
-  m=0;
+  m=0; //Fehler zaehler vom Sensor zurücksetzten 
   }
 /*Verbindungen
  *AT    Arduino -> Physical
  *D0    D4->  Taster zum Einschalten weiter auf GND
  *D2    D5->  Ultraschall TRIG
- *D3    D6->  Ultraschall ECHO
+ *D1    D6->  Ultraschall ECHO
  *D3    D7->  Display RS (4v.l.)
  *D4    D8->  Dispaly E (6v.l.)
  *D5    D9->  Display D4 (11v.l.)

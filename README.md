@@ -19,7 +19,7 @@ Versionshistorie
 Tests:
 Rohr-> Funtioniert einwandfrei, min d 50mm
 Langes Kabel -> Problemlos, bei ca 10m?
-Automatisches Starten (Zeitschaltuhr) -> ????
+Automatisches Starten (Zeitschaltuhr) -> funktioniert
 
 
 Verbindungen
